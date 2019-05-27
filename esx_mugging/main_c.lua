@@ -13,9 +13,6 @@ local giveableItems = {
 	'soda'
 }
 
-RegisterCommand('suicide', function()
-    SetEntityHealth(PlayerPedId(),0)
-end, false)
 
 Citizen.CreateThread(function()
 
