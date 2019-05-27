@@ -19,7 +19,7 @@ Features:
 	Can set Always Notify on death -  This will always notify Police of Murder if NPC is killed during mugging.  Once they start running the script will not notify if you kill them.
 	Must have Weapon that is not from melee/explosive catagory to start a mugging.
 	If you aim at a vehicle that is moving at all (even being pushed) the NPC will ignore the mugging script and act as the game dictates.
-	If you aim at a drive of a stopped vehicle the driver will exit the vehicle and put hands up you can then start the mugging.
+	If you aim at a driver of a stopped vehicle the driver will exit the vehicle and put hands up you can then start the mugging.
 	Player can stop same NPC but if that npc is last one mugged will not be able to mug again.
 	Police Notification gives Alert as well as Circle that will slowly vanish over time (default is 250 seconds - not in Config.lua with this version)
   
