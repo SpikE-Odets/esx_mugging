@@ -4,9 +4,10 @@ This script will allow anyone other then police to mug locals on a server.
 This was based off https://github.com/D3uxx/esx_robnpc with a few improvments.
 
 
--- Requires --
-ESX_Jobs
-ESX_Policejobs
+-- Requires --	
+
+	ESX_Jobs
+	ESX_Policejobs
 
 
 
