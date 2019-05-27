@@ -12,7 +12,8 @@ end)
 
 RegisterServerEvent('esx_muggings:giveMoney')
 AddEventHandler('esx_muggings:giveMoney', function()
-    local player = ESX.GetPlayerFromId(source)
+    local _source = source
+    local player = ESX.GetPlayerFromId(_source)
     local amount = math.random(Config.MinMoney, Config.MaxMoney)
     player.addMoney(amount)
     TriggerClientEvent("esx:showNotification", source, ("You stole $%s"):format(amount))
@@ -21,7 +22,7 @@ end)
 RegisterServerEvent('esx_muggings:giveItems')
 AddEventHandler('esx_muggings:giveItems', function(itemName)
     local _source = source
-	local xPlayer  = ESX.GetPlayerFromId(source)
+	local xPlayer  = ESX.GetPlayerFromId(_source)
         xPlayer.addInventoryItem(itemName, 1)
 
 end)
