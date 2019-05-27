@@ -32,7 +32,7 @@ RegisterServerEvent('esx_mugging:muggingAlert')
 AddEventHandler('esx_mugging:muggingAlert', function(street1, street2, sex)
 	TriggerClientEvent("muggingNotify", -1, "~r~Reported Mugging by ~w~ "..sex.." ~r~near~w~  "..street1.." ~r~ and ~w~  "..street2)
 end)
---if you need you can translate it to your language too
+
 RegisterServerEvent('esx_mugging:muggingAlertS1')
 AddEventHandler('esx_mugging:muggingAlertS1', function(street1, sex)
 	TriggerClientEvent("muggingNotify", -1, "~r~Reported Mugging by ~w~ "..sex.." ~r~near~w~  "..street1)
