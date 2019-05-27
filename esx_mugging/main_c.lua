@@ -23,14 +23,6 @@ Citizen.CreateThread(function()
     ESX.PlayerData = ESX.GetPlayerData()
 end)
 
-RegisterCommand('job', function()
-    ESX.PlayerData = ESX.GetPlayerData()
-    if ESX.PlayerData.job.name == 'police' then
-        ESX.ShowNotification(GetPlayerServerID(GetPlayerPed(-1)))
-    else
-       ESX.ShowNotification("knows im not a police")
-    end
-end, false)
 
 Citizen.CreateThread(function()
     while true do
