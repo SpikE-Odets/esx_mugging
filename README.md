@@ -7,7 +7,7 @@ This was based off https://github.com/D3uxx/esx_robnpc with a few improvments.
 -- Requires --	
 
 	ESX_Jobs
-	ESX_Policejobs
+	ESX_Policejob
 
 
 
