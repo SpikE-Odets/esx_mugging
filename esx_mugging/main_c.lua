@@ -13,7 +13,6 @@ local giveableItems = {
 	'soda'
 }
 
-
 Citizen.CreateThread(function()
     while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -34,13 +33,12 @@ Citizen.CreateThread(function()
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed)  then
+                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) then
                     if aiming then
                     local playerPed = GetPlayerPed(-1)
                     local pCoords = GetEntityCoords(playerPed, true)
                     local tCoords = GetEntityCoords(targetPed, true)
                         if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) and not IsPedDeadOrDying(targetPed) then
-                            SetEntityAsMissionEntity(targetPed, true, true)
                             if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then
                                 if IsPedInAnyVehicle(targetPed, true) then
                                     local localvehicle = GetVehiclePedIsIn(targetPed, false)
@@ -87,7 +85,7 @@ function robNpc(targetPed)
                     currentrobbing = true
                     TaskHandsUp(targetPed, 1000, 0, 0, true)
                     ESX.ShowNotification("Already Mugged this person.")
-                    SetEntityAsNoLongerNeeded(targetPed)
+                    
                     TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
                     Citizen.Wait(3000)
                     robbing = false
@@ -135,7 +133,7 @@ function robNpc(targetPed)
                                     end
                                 end)
                             end
-                            SetEntityAsNoLongerNeeded(targetPed)
+                            
                             TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
                             Citizen.Wait(3000)
 
@@ -144,7 +142,7 @@ function robNpc(targetPed)
                             currentrobbing = false
                         else
                             if Config.AlwaysNotifyonDeath then
-                                SetEntityAsNoLongerNeeded(targetPed)
+                                
                                 ESX.ShowNotification("Target died - Police will be notified")
                                 ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                                     local sex = nil
@@ -163,7 +161,7 @@ function robNpc(targetPed)
                         end
                     else
                         ESX.ShowNotification("Target ran away")
-                        SetEntityAsNoLongerNeeded(targetPed)
+                        
                         lastrobbed = math.random(1, 100)
                         if lastrobbed <= Config.PoliceNotify then
                             ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
