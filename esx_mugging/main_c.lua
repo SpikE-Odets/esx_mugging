@@ -31,7 +31,7 @@ Citizen.CreateThread(function()
 
         else  
         if IsPlayerFreeAiming(PlayerId()) then
-            local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
+            local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
                 if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed)  then
                     if aiming then
                     local playerPed = GetPlayerPed(-1)
@@ -80,10 +80,9 @@ function robNpc(targetPed)
                     currentrobbing = true
                     TaskHandsUp(targetPed, 1000, 0, 0, true)
                     ESX.ShowNotification("Already Mugged this person.")
-                    ClearPedTasks(targetPed)
-                    TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
-                    Citizen.Wait(2000)
                     SetEntityAsNoLongerNeeded(targetPed)
+                    TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
+                    Citizen.Wait(3000)
                     robbing = false
                     currentrobbing = false
                 else
@@ -129,11 +128,10 @@ function robNpc(targetPed)
                                     end
                                 end)
                             end
-                            ClearPedTasks(targetPed)
-                            TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
-                            Citizen.Wait(5000)
                             SetEntityAsNoLongerNeeded(targetPed)
-                            
+                            TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
+                            Citizen.Wait(3000)
+
                             lasttargetPed = targetPed
                             robbing = false
                             currentrobbing = false
