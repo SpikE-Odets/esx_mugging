@@ -26,40 +26,37 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        plyPos = GetEntityCoords(GetPlayerPed(-1),  true)
-        s1, s2 = Citizen.InvokeNative( 0x2EB41072B4C1E4C0, plyPos.x, plyPos.y, plyPos.z, Citizen.PointerValueInt(), Citizen.PointerValueInt() )
-        street1 = GetStreetNameFromHashKey(s1)
-        street2 = GetStreetNameFromHashKey(s2)
         Citizen.Wait(0)
         if robbing then
 
-        else        
-         ESX.PlayerData = ESX.GetPlayerData()
-        local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
-           if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed)  then
-                if aiming then
-                local playerPed = GetPlayerPed(-1)
-                local pCoords = GetEntityCoords(playerPed, true)
-                local tCoords = GetEntityCoords(targetPed, true)
-                    if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) and not IsPedDeadOrDying(targetPed) then
-                        SetEntityAsMissionEntity(targetPed, true, true)
-                        if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then
-                            if IsPedInAnyVehicle(targetPed, true) then
-                                local localvehicle = GetVehiclePedIsIn(targetPed, false)
-                                if IsVehicleStopped(localvehicle) then
-                                    TaskLeaveVehicle(targetPed, localvehicle, 1)
-                                    ClearPedTasks(targetPed)
-                                    Citizen.Wait(1000)
-                                    if not robbing then
-                                        robNpc(targetPed)
+        else  
+        if IsPlayerFreeAiming(PlayerId()) then
+            ESX.PlayerData = ESX.GetPlayerData()
+            local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
+                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed)  then
+                    if aiming then
+                    local playerPed = GetPlayerPed(-1)
+                    local pCoords = GetEntityCoords(playerPed, true)
+                    local tCoords = GetEntityCoords(targetPed, true)
+                        if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) and not IsPedDeadOrDying(targetPed) then
+                            SetEntityAsMissionEntity(targetPed, true, true)
+                            if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then
+                                if IsPedInAnyVehicle(targetPed, true) then
+                                    local localvehicle = GetVehiclePedIsIn(targetPed, false)
+                                    if IsVehicleStopped(localvehicle) then
+                                        TaskLeaveVehicle(targetPed, localvehicle, 1)
+                                        ClearPedTasks(targetPed)
+                                        Citizen.Wait(1000)
+                                        if not robbing then
+                                            robNpc(targetPed)
+                                        end
                                     end
+                                elseif not robbing then
+                                    robNpc(targetPed)
                                 end
-                            elseif not robbing then
-
-                                robNpc(targetPed)
                             end
-                        end
-                    end    
+                        end    
+                    end
                 end
             end
         end  
@@ -74,7 +71,7 @@ function robNpc(targetPed)
     elseif lasttargetPed == targetPed then
     ESX.Game.Utils.DrawText3D(roblocalcoords, "Already Mugged..", 0.25)
     else
-    ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging...", 0.25)
+
     end
     TaskHandsUp(targetPed, 5500, 0, 0, true)
         if IsControlJustReleased(0, 38) then
@@ -84,17 +81,18 @@ function robNpc(targetPed)
                     currentrobbing = true
                     TaskHandsUp(targetPed, 1000, 0, 0, true)
                     ESX.ShowNotification("Already Mugged this person.")
+                    ClearPedTasks(targetPed)
                     TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
-                    SetEntityAsNoLongerNeeded(targetPed)
                     Citizen.Wait(2000)
+                    SetEntityAsNoLongerNeeded(targetPed)
                     robbing = false
                     currentrobbing = false
                 else
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                     currentrobbing = true
-                    TaskHandsUp(targetPed, 5500, 0, 0, true)
+                    TaskHandsUp(targetPed, Config.RobWaitTime * 1000, 0, 0, true)
+                    exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
                     Citizen.Wait(Config.RobWaitTime * 1000)
-                    SetEntityAsNoLongerNeeded(targetPed)
                     if not IsPedFleeing(targetPed) then
                        if not IsPedDeadOrDying(targetPed) then
                             TriggerServerEvent("esx_muggings:giveMoney")
@@ -116,7 +114,7 @@ function robNpc(targetPed)
                             robbing = true
                             lastrobbed = math.random(1, 100)
                             if lastrobbed <= Config.PoliceNotify then
-                                ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
+                                    ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                                     local sex = nil
                                     if skin.sex == 0 then
                                         sex = "Male" --male/change it to your language
@@ -132,10 +130,11 @@ function robNpc(targetPed)
                                     end
                                 end)
                             end
-                            TriggerServerEvent('esx_mugging:muggingNotify')
+                            ClearPedTasks(targetPed)
                             TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
+                            Citizen.Wait(5000)
                             SetEntityAsNoLongerNeeded(targetPed)
-                            Citizen.Wait(2000)
+                            
                             lasttargetPed = targetPed
                             robbing = false
                             currentrobbing = false
