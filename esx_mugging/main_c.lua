@@ -31,7 +31,6 @@ Citizen.CreateThread(function()
 
         else  
         if IsPlayerFreeAiming(PlayerId()) then
-            ESX.PlayerData = ESX.GetPlayerData()
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
                 if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed)  then
                     if aiming then
