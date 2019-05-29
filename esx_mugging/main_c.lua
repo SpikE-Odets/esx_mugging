@@ -15,13 +15,18 @@ local giveableItems = {
 
 
 Citizen.CreateThread(function()
-
-	while ESX == nil do
+    while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 		Citizen.Wait(0)
 	end
-    ESX.PlayerData = ESX.GetPlayerData()
+
+	while ESX.GetPlayerData().job == nil do
+		Citizen.Wait(10)
+	end
+
+	ESX.PlayerData = ESX.GetPlayerData()
 end)
+
 
 
 Citizen.CreateThread(function()
