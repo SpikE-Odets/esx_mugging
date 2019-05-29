@@ -19,14 +19,11 @@ Citizen.CreateThread(function()
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 		Citizen.Wait(0)
 	end
-
 	while ESX.GetPlayerData().job == nil do
 		Citizen.Wait(10)
 	end
-
 	ESX.PlayerData = ESX.GetPlayerData()
 end)
-
 
 
 Citizen.CreateThread(function()
@@ -78,7 +75,12 @@ function robNpc(targetPed)
     ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging..", 0.25)
     end
     TaskHandsUp(targetPed, 5500, 0, 0, true)
+    
         if IsControlJustReleased(0, 38) then
+            local plyPos = GetEntityCoords(GetPlayerPed(-1),  true)
+            local s1, s2 = Citizen.InvokeNative( 0x2EB41072B4C1E4C0, plyPos.x, plyPos.y, plyPos.z, Citizen.PointerValueInt(), Citizen.PointerValueInt() )
+            local street1 = GetStreetNameFromHashKey(s1)
+            local street2 = GetStreetNameFromHashKey(s2)
             if not currentrobbing then
                 if lasttargetPed == targetPed then
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
