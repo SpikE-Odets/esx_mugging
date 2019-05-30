@@ -1,17 +1,28 @@
-local ESX = nil
+ESX = nil
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+local copsConnected = 0
 
 
-Citizen.CreateThread(function()
+function CountCops()
 
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
-	end
+    local xPlayers = ESX.GetPlayers()
+    copsConnected = 0
 
-end)
+    for i=1, #xPlayers, 1 do
+        local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
+        if xPlayer.job.name == 'police' then
+            copsConnected = copsConnected + 1
+        end
+    end
+    TriggerClientEvent('esx_mugging:copsConnected', -1, copsConnected)
 
-RegisterServerEvent('esx_muggings:giveMoney')
-AddEventHandler('esx_muggings:giveMoney', function()
+    SetTimeout(60000, CountCops)
+
+end
+CountCops()
+
+RegisterServerEvent('esx_mugging:giveMoney')
+AddEventHandler('esx_mugging:giveMoney', function()
     local _source = source
     local player = ESX.GetPlayerFromId(_source)
     local amount = math.random(Config.MinMoney, Config.MaxMoney)
@@ -19,13 +30,14 @@ AddEventHandler('esx_muggings:giveMoney', function()
     TriggerClientEvent("esx:showNotification", source, ("You stole $%s"):format(amount))
 end)
 
-RegisterServerEvent('esx_muggings:giveItems')
-AddEventHandler('esx_muggings:giveItems', function(itemName)
+RegisterServerEvent('esx_mugging:giveItems')
+AddEventHandler('esx_mugging:giveItems', function(itemName)
     local _source = source
 	local xPlayer  = ESX.GetPlayerFromId(_source)
         xPlayer.addInventoryItem(itemName, 1)
 
 end)
+
 
 
 RegisterServerEvent('esx_mugging:muggingAlert')
@@ -46,3 +58,4 @@ RegisterServerEvent('esx_mugging:muggingPos')
 AddEventHandler('esx_mugging:muggingPos', function(gx, gy, gz)
 	TriggerClientEvent('esx_mugging:muggingPos', -1, gx, gy, gz)
 end)
+

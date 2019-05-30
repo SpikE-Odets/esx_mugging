@@ -2,6 +2,7 @@ ESX                           = nil
 lastrobbed = 0
 local robbing = false
 local currentrobbing = false
+local copsConnected = 0
 local giveableItems = {
     'weed_pooch',
 	'water',
@@ -12,6 +13,7 @@ local giveableItems = {
 	'lsd_pooch',
 	'soda'
 }
+
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -33,7 +35,7 @@ Citizen.CreateThread(function()
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) then
+                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
                     local playerPed = GetPlayerPed(-1)
                     local pCoords = GetEntityCoords(playerPed, true)
@@ -70,7 +72,9 @@ function robNpc(targetPed)
     elseif lasttargetPed == targetPed then
     ESX.Game.Utils.DrawText3D(roblocalcoords, "Already Mugged..", 0.25)
     else
-    ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging..", 0.25)
+        if not Config.progressBars then
+        ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging..", 0.25)
+        end
     end
     TaskHandsUp(targetPed, 5500, 0, 0, true)
     
@@ -94,18 +98,20 @@ function robNpc(targetPed)
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                     currentrobbing = true
                     TaskHandsUp(targetPed, Config.RobWaitTime * 1000, 0, 0, true)
-                    --exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
+                    if Config.progressBars then
+                    exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
+                    end 
                     Citizen.Wait(Config.RobWaitTime * 1000)
                     if not IsPedFleeing(targetPed) then
                        if not IsPedDeadOrDying(targetPed) then
-                            TriggerServerEvent("esx_muggings:giveMoney")
+                            TriggerServerEvent("esx_mugging:giveMoney")
                             additems = math.random(1,100)
                                 if additems <= Config.AddItemsPerctent then
                                         randomitemcount = math.random(1,Config.AddItemsMax)
                                     for i = randomitemcount,1,-1
                                     do
                                         local itemName = giveableItems[GetRandomIntInRange(1,  #giveableItems)]
-                                        TriggerServerEvent('esx_muggings:giveItems', (itemName))
+                                        TriggerServerEvent('esx_mugging:giveItems', (itemName))
                                     end
                                 end
                             randomact = math.random(1,10)
@@ -142,7 +148,6 @@ function robNpc(targetPed)
                             currentrobbing = false
                         else
                             if Config.AlwaysNotifyonDeath then
-                                
                                 ESX.ShowNotification("Target died - Police will be notified")
                                 ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                                     local sex = nil
@@ -161,7 +166,6 @@ function robNpc(targetPed)
                         end
                     else
                         ESX.ShowNotification("Target ran away")
-                        
                         lastrobbed = math.random(1, 100)
                         if lastrobbed <= Config.PoliceNotify then
                             ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
@@ -188,7 +192,13 @@ function robNpc(targetPed)
     end)
 end
 
-GetPlayerName()
+RegisterNetEvent('esx_mugging:copsConnected')
+AddEventHandler('esx_mugging:copsConnected', function(copsNumber)
+    copsConnected = copsNumber
+    ESX.PlayerData = ESX.GetPlayerData()
+end)
+
+
 RegisterNetEvent('muggingNotify')
 AddEventHandler('muggingNotify', function(alert, xPlayer)
         if  ESX.PlayerData.job.name == 'police' then       
