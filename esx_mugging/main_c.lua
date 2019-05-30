@@ -3,16 +3,6 @@ lastrobbed = 0
 local robbing = false
 local currentrobbing = false
 local copsConnected = 0
-local giveableItems = {
-    'weed_pooch',
-	'water',
-	'bread',
-	'lighter',
-	'coke_pooch',
-	'vodka',
-	'lsd_pooch',
-	'soda'
-}
 
 
 Citizen.CreateThread(function()
@@ -110,7 +100,8 @@ function robNpc(targetPed)
                                         randomitemcount = math.random(1,Config.AddItemsMax)
                                     for i = randomitemcount,1,-1
                                     do
-                                        local itemName = giveableItems[GetRandomIntInRange(1,  #giveableItems)]
+                                        local randomitempull = math.random(1, #Config.giveableItems)
+                                        local itemName = Config.giveableItems[randomitempull]
                                         TriggerServerEvent('esx_mugging:giveItems', (itemName))
                                     end
                                 end
@@ -195,9 +186,12 @@ end
 RegisterNetEvent('esx_mugging:copsConnected')
 AddEventHandler('esx_mugging:copsConnected', function(copsNumber)
     copsConnected = copsNumber
-    ESX.PlayerData = ESX.GetPlayerData()
 end)
 
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+	ESX.PlayerData.job = job
+end)
 
 RegisterNetEvent('muggingNotify')
 AddEventHandler('muggingNotify', function(alert, xPlayer)
@@ -206,11 +200,7 @@ AddEventHandler('muggingNotify', function(alert, xPlayer)
         end
 end)
 
-function Notify(text)
-    SetNotificationTextEntry('STRING')
-    AddTextComponentString(text)
-    DrawNotification(false, false)
-end
+
 
 RegisterNetEvent('esx_mugging:muggingPos')
 AddEventHandler('esx_mugging:muggingPos', function(tx, ty, tz)
