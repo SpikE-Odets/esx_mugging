@@ -42,7 +42,7 @@ end)
 
 RegisterServerEvent('esx_mugging:muggingAlert')
 AddEventHandler('esx_mugging:muggingAlert', function(street1, street2, sex, coords)
-    if Config.GCPhone = true then
+    if Config.GCPhone  then
         TriggerClientEvent("muggingNotify", -1, "Reported Mugging by "..sex.." near "..street1.." and "..street2, coords)
     else
 	    TriggerClientEvent("muggingNotify", -1, "~r~Reported Mugging by ~w~ "..sex.." ~r~near~w~ "..street1.." and "..street2, coords)
@@ -52,7 +52,7 @@ end)
 
 RegisterServerEvent('esx_mugging:muggingAlertS1')
 AddEventHandler('esx_mugging:muggingAlertS1', function(street1, sex, coords)
-    if Config.GCPhone = true then
+    if Config.GCPhone  then
         TriggerClientEvent("muggingNotify", -1, "Reported Mugging by "..sex.." near "..street1, coords)
     else
 	    TriggerClientEvent("muggingNotify", -1, "~r~Reported Mugging by~w~ "..sex.." ~r~near~w~ "..street1, coords)
@@ -60,7 +60,7 @@ AddEventHandler('esx_mugging:muggingAlertS1', function(street1, sex, coords)
 end)
 RegisterServerEvent('esx_mugging:muggingAlertS2')
 AddEventHandler('esx_mugging:muggingAlertS2', function(street1, sex, coords)
-    if Config.GCPhone = true then
+    if Config.GCPhone then
         TriggerClientEvent("muggingNotify", -1, "Reported Murder by "..sex.." near "..street1, coords)
     else
         TriggerClientEvent("muggingNotify", -1, "~r~Reported Murder by~w~ "..sex.." ~r~near~w~ "..street1, coords)
