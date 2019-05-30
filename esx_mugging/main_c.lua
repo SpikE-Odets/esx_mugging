@@ -17,6 +17,7 @@ Citizen.CreateThread(function()
 end)
 
 
+
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
@@ -25,7 +26,7 @@ Citizen.CreateThread(function()
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
+                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name == 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
                     local playerPed = GetPlayerPed(-1)
                     local pCoords = GetEntityCoords(playerPed, true)
@@ -73,6 +74,11 @@ function robNpc(targetPed)
             local s1, s2 = Citizen.InvokeNative( 0x2EB41072B4C1E4C0, plyPos.x, plyPos.y, plyPos.z, Citizen.PointerValueInt(), Citizen.PointerValueInt() )
             local street1 = GetStreetNameFromHashKey(s1)
             local street2 = GetStreetNameFromHashKey(s2)
+            local reportcoords = {
+                x = plyPos.x,
+                y = plyPos.y,
+                z = plyPos.z - 1,
+            }
             if not currentrobbing then
                 if lasttargetPed == targetPed then
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
@@ -124,9 +130,9 @@ function robNpc(targetPed)
                                     TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
 
                                     if s2 == 0 then
-                                        TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex)
+                                        TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, reportcoords)
                                     elseif s2 ~= 0 then
-                                        TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex)
+                                        TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
                                     end
                                 end)
                             end
@@ -148,7 +154,7 @@ function robNpc(targetPed)
                                         sex = "Female" --female/change it to your language
                                     end
                                     TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
-                                    TriggerServerEvent('esx_mugging:muggingAlertS2', street1, sex)
+                                    TriggerServerEvent('esx_mugging:muggingAlertS2', street1, sex, reportcoords)
 
                                 end)
                             end
@@ -168,9 +174,9 @@ function robNpc(targetPed)
                                 end
                                 TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
                                 if s2 == 0 then
-                                    TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex)
+                                    TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, plyPos)
                                 elseif s2 ~= 0 then
-                                    TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex)
+                                    TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
                                 end
                             end)
                         end
@@ -194,9 +200,13 @@ AddEventHandler('esx:setJob', function(job)
 end)
 
 RegisterNetEvent('muggingNotify')
-AddEventHandler('muggingNotify', function(alert, xPlayer)
-        if  ESX.PlayerData.job.name == 'police' then       
-        ESX.ShowAdvancedNotification('911 Emergency', 'Mugging', alert, 'CHAR_CALL911', 1)
+AddEventHandler('muggingNotify', function(alert, xPlayer, coords)
+        if  ESX.PlayerData.job.name == 'police' then  
+            if Config.GCPhone then 
+                TriggerServerEvent('esx_phone:send', "police", alert, true, coords)    
+            else
+                ESX.ShowAdvancedNotification('911 Emergency', 'Mugging', alert, 'CHAR_CALL911', 1)
+            end
         end
 end)
 
