@@ -9,8 +9,23 @@ This was based off https://github.com/D3uxx/esx_robnpc with a few improvements.
         
 	ESX_Jobs
 	ESX_Policejob
+	progressBars (optional)
 
+Change Log:
 
+Latest Version:
+
+	Fixed error that was showing up on server script for expected then near =
+	Removed the function to mug animals (funny but unintentional)
+
+Previous Fix:
+
+	Added check for player so you can not mug other players on the server.
+	Added Police Requirement in Config
+	Added progressBar support in Config if set to false you do not have to have progressBar installed.
+	Moved Giveable items to the Config for easier adjusting for server owners.
+	Fixed ESX.jobname not noticing new job until restart - thanks to XxFri3ndlyxX
+	Removed Mugging MissionEntityPeds so servers with doctors or clerks stationed around town dont need to worry about them.
 
 Features:
 
