@@ -14,12 +14,13 @@ This was based off https://github.com/D3uxx/esx_robnpc with a few improvements.
 Change Log:
 
 Latest Version:
-
+	
+	Added support for BlackMoney in Config.   Just set  Config.DirtyMoney = true   and will payout only BlackMoney.
+	
+Previous Fix:
+	
 	Fixed error that was showing up on server script for expected then near =
 	Removed the function to mug animals (funny but unintentional)
-
-Previous Fix:
-
 	Added check for player so you can not mug other players on the server.
 	Added Police Requirement in Config
 	Added progressBar support in Config if set to false you do not have to have progressBar installed.
