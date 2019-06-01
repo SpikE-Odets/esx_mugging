@@ -3,7 +3,9 @@ lastrobbed = 0
 local robbing = false
 local currentrobbing = false
 local copsConnected = 0
-
+local playerPed = nil
+local pCoords = nil
+local tCoords = nil
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -21,16 +23,16 @@ end)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        if robbing then
+        if robbing or IsPedInAnyVehicle(GetPlayerPed(-1),true) then
 
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
                 if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and IsPedHuman(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
-                    local playerPed = GetPlayerPed(-1)
-                    local pCoords = GetEntityCoords(playerPed, true)
-                    local tCoords = GetEntityCoords(targetPed, true)
+                    playerPed = GetPlayerPed(-1)
+                    pCoords = GetEntityCoords(playerPed, true)
+                    tCoords = GetEntityCoords(targetPed, true)
                         if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) and not IsPedDeadOrDying(targetPed) then
                             if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then
                                 if IsPedInAnyVehicle(targetPed, true) then
@@ -98,7 +100,10 @@ function robNpc(targetPed)
                     exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
                     end 
                     Citizen.Wait(Config.RobWaitTime * 1000)
-                    if not IsPedFleeing(targetPed) then
+                    playerPed = GetPlayerPed(-1)
+                    pCoords = GetEntityCoords(playerPed, true)
+                    tCoords = GetEntityCoords(targetPed, true)
+                    if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then 
                        if not IsPedDeadOrDying(targetPed) then
                             TriggerServerEvent("esx_mugging:giveMoney")
                             additems = math.random(1,100)
@@ -162,7 +167,7 @@ function robNpc(targetPed)
                             currentrobbing = false
                         end
                     else
-                        ESX.ShowNotification("Target ran away")
+                        ESX.ShowNotification("To far away from target")
                         lastrobbed = math.random(1, 100)
                         if lastrobbed <= Config.PoliceNotify then
                             ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)

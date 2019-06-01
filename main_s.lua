@@ -27,8 +27,10 @@ AddEventHandler('esx_mugging:giveMoney', function()
     local player = ESX.GetPlayerFromId(_source)
     local amount = math.random(Config.MinMoney, Config.MaxMoney)
     if Config.DirtyMoney then
+        print('trying to add dirty money')
         player.addAccountMoney('black_money', amount)
     else
+        print('tring to add cash')
         player.addMoney(amount)
     end
     TriggerClientEvent("esx:showNotification", source, ("You stole $%s"):format(amount))
