@@ -14,11 +14,14 @@ This was based off https://github.com/D3uxx/esx_robnpc with a few improvements.
 Change Log:
 
 Latest Version:
+
+	Removed the abality to mug NPC from inside vehicle.
+	Changed the check for target running away - check for target distance. ( no more mugging and running away from NPC and still getting cash)
 	
-	Added support for BlackMoney in Config.   Just set  Config.DirtyMoney = true   and will payout only BlackMoney.
 	
 Previous Fix:
 	
+	Added support for BlackMoney in Config.   Just set  Config.DirtyMoney = true   and will payout only BlackMoney.
 	Fixed error that was showing up on server script for expected then near =
 	Removed the function to mug animals (funny but unintentional)
 	Added check for player so you can not mug other players on the server.
