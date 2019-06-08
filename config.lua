@@ -3,7 +3,7 @@ Config.Locale = 'en'
 
 Config.DirtyMoney = false           --  added for servers that wish to add to black money account instead of cash.
 Config.GCPhone = false              --  added for GCPhone server that was not getting police alerts.
-Config.progressBars = true          --  If your server has progressBars and wants to use vs text for mugging time.
+Config.progressBars = false         --  If your server has progressBars and wants to use vs text for mugging time.
 Config.CopsNeeded = 0               --  Number of Police needed to mug locals.
 Config.MinMoney = 5                 --  Min amount of money received from mugging
 Config.MaxMoney = 100               --  Max amount of money received from mugging.
