@@ -28,7 +28,7 @@ Citizen.CreateThread(function()
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and IsPedHuman(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
+               if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedFleeing(targetPed) and not IsPedAPlayer(targetPed) and IsPedHuman(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
                     playerPed = GetPlayerPed(-1)
                     pCoords = GetEntityCoords(playerPed, true)
