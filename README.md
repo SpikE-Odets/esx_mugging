@@ -15,12 +15,13 @@ Change Log:
 
 Latest Version:
 
-	Removed the abality to mug NPC from inside vehicle.
-	Changed the check for target running away - check for target distance. ( no more mugging and running away from NPC and still getting cash)
+	Added check to see if ped is fleeing - no more stopping NPC from full sprint.
 	
 	
 Previous Fix:
 	
+	Removed the abality to mug NPC from inside vehicle.
+	Changed the check for target running away - check for target distance. ( no more mugging and running away from NPC and still getting cash)
 	Added support for BlackMoney in Config.   Just set  Config.DirtyMoney = true   and will payout only BlackMoney.
 	Fixed error that was showing up on server script for expected then near =
 	Removed the function to mug animals (funny but unintentional)
