@@ -1,11 +1,8 @@
 ESX                           = nil
-lastrobbed = 0
-local robbing = false
-local currentrobbing = false
-local copsConnected = 0
-local playerPed = nil
-local pCoords = nil
-local tCoords = nil
+local lastrobbed, copsConnected, cooldowntime = 0,0,0
+local robbing, currentrobbing, notneeded, checkforvoice, IsMuggingAllowed  = false, false, false, false, true
+local playerPed, pCoords, tCoords = nil, nil, nil
+
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -18,17 +15,42 @@ Citizen.CreateThread(function()
 	ESX.PlayerData = ESX.GetPlayerData()
 end)
 
+--[[Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        while checkforvoice do
+            Citizen.Wait(0)
+            NetworkIsPlayerTalking(PlayerId()) then
+            currentrobbing = true
+            checkforvoice = false
+        end
+    end
+end)]]
+
+function voicecheck()
+   
+end
+
+
+function CoolDown()
+    cooldowntime = Config.CoolDownTime
+    while not IsMuggingAllowed do
+        Wait(1000)
+        cooldowntime = cooldowntime - 1
+        if cooldowntime == 0 then
+            IsMuggingAllowed = true
+        end
+    end
+end
 
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
-        if robbing or IsPedInAnyVehicle(GetPlayerPed(-1),true) then
-
-        else  
+    Citizen.Wait(0)
+    if not robbing and not IsPedInAnyVehicle(GetPlayerPed(-1),true) then
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-               if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedFleeing(targetPed) and not IsPedAPlayer(targetPed) and IsPedHuman(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
+            if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedFleeing(targetPed) and not IsPedAPlayer(targetPed) and IsPedHuman(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
                     playerPed = GetPlayerPed(-1)
                     pCoords = GetEntityCoords(playerPed, true)
@@ -37,16 +59,25 @@ Citizen.CreateThread(function()
                             if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then
                                 if IsPedInAnyVehicle(targetPed, true) then
                                     local localvehicle = GetVehiclePedIsIn(targetPed, false)
-                                    if IsVehicleStopped(localvehicle) then
+                                    if IsVehicleStopped(localvehicle) and not robbing and IsMuggingAllowed then
                                         TaskLeaveVehicle(targetPed, localvehicle, 1)
+                                        ResetPedLastVehicle(targetPed)
                                         ClearPedTasks(targetPed)
                                         Citizen.Wait(1000)
-                                        if not robbing then
-                                            robNpc(targetPed)
+                                        if not robbing and IsMuggingAllowed then
+                                            if targetPed ~= lasttargetPed then
+                                                robNpc(targetPed)
+                                            else
+                                                AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)  
+                                            end
                                         end
                                     end
-                                elseif not robbing then
-                                    robNpc(targetPed)
+                                elseif not robbing and IsMuggingAllowed then
+                                    if targetPed ~= lasttargetPed then
+                                        robNpc(targetPed)
+                                    else
+                                        AddShockingEventAtPosition(116, GetEntityCoords(targetPed),0.5)  
+                                    end
                                 end
                             end
                         end    
@@ -59,19 +90,26 @@ end)
 
 function robNpc(targetPed)
     Citizen.CreateThread(function()
-    local roblocalcoords = GetEntityCoords(targetPed)
-    if not currentrobbing then 
-    ESX.Game.Utils.DrawText3D(roblocalcoords, "[~g~E~s~] to Mug", 0.25)
-    elseif lasttargetPed == targetPed then
-    ESX.Game.Utils.DrawText3D(roblocalcoords, "Already Mugged..", 0.25)
-    else
-        if not Config.progressBars then
-        ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging..", 0.25)
+        Citizen.Wait(0)
+        local roblocalcoords = GetEntityCoords(targetPed)
+        if not currentrobbing then 
+            if Config.MustUseVoice then
+                ESX.Game.Utils.DrawText3D(roblocalcoords, "Mug...", 0.25)
+            else
+                ESX.Game.Utils.DrawText3D(roblocalcoords, "[~g~E~s~] to Mug", 0.25)
+            end
+        elseif lasttargetPed == targetPed then
+            ESX.Game.Utils.DrawText3D(roblocalcoords, "Already Mugged..", 0.25)
+        else
+            if not Config.progressBars then
+            ESX.Game.Utils.DrawText3D(roblocalcoords, "Mugging..", 0.25)
+            end
         end
-    end
-    TaskHandsUp(targetPed, 5500, 0, 0, true)
-    
-        if IsControlJustReleased(0, 38) then
+        TaskHandsUp(targetPed, 5500, 0, 0, true)
+        if Config.MustUseVoice and NetworkIsPlayerTalking(PlayerId()) then notneeded = true end
+        if not Config.MustUseVoice and IsControlJustReleased(0,38) then notneeded = true end
+        if notneeded then
+            notneeded = false
             local plyPos = GetEntityCoords(GetPlayerPed(-1),  true)
             local s1, s2 = Citizen.InvokeNative( 0x2EB41072B4C1E4C0, plyPos.x, plyPos.y, plyPos.z, Citizen.PointerValueInt(), Citizen.PointerValueInt() )
             local street1 = GetStreetNameFromHashKey(s1)
@@ -82,94 +120,70 @@ function robNpc(targetPed)
                 z = plyPos.z - 1,
             }
             if not currentrobbing then
-                if lasttargetPed == targetPed then
-                    PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
-                    currentrobbing = true
-                    TaskHandsUp(targetPed, 1000, 0, 0, true)
-                    ESX.ShowNotification("Already Mugged this person.")
-                    
-                    TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
-                    Citizen.Wait(3000)
-                    robbing = false
-                    currentrobbing = false
-                else
-                    PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
-                    currentrobbing = true
-                    TaskHandsUp(targetPed, Config.RobWaitTime * 1000, 0, 0, true)
-                    if Config.progressBars then
+                PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
+                currentrobbing = true
+                TaskHandsUp(targetPed, Config.RobWaitTime * 1000, 0, 0, true)
+                if Config.progressBars then
                     exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
-                    end 
-                    Citizen.Wait(Config.RobWaitTime * 1000)
-                    playerPed = GetPlayerPed(-1)
-                    pCoords = GetEntityCoords(playerPed, true)
-                    tCoords = GetEntityCoords(targetPed, true)
-                    if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then 
-                       if not IsPedDeadOrDying(targetPed) then
-                            TriggerServerEvent("esx_mugging:giveMoney")
-                            additems = math.random(1,100)
-                                if additems <= Config.AddItemsPerctent then
-                                        randomitemcount = math.random(1,Config.AddItemsMax)
-                                    for i = randomitemcount,1,-1
-                                    do
-                                        local randomitempull = math.random(1, #Config.giveableItems)
-                                        local itemName = Config.giveableItems[randomitempull]
-                                        TriggerServerEvent('esx_mugging:giveItems', (itemName))
-                                    end
+                end 
+                Citizen.Wait(Config.RobWaitTime * 1000)
+                playerPed = GetPlayerPed(-1)
+                pCoords = GetEntityCoords(playerPed, true)
+                tCoords = GetEntityCoords(targetPed, true)
+                if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then 
+                    if not IsPedDeadOrDying(targetPed) then
+                        AddShockingEventAtPosition(116, GetEntityCoords(targetPed),0.5)
+                        TriggerServerEvent("esx_mugging:giveMoney")
+                        additems = math.random(1,100)
+                            if additems <= Config.AddItemsPerctent then
+                                    randomitemcount = math.random(1,Config.AddItemsMax)
+                                for i = randomitemcount,1,-1
+                                do
+                                    local randomitempull = math.random(1, #Config.giveableItems)
+                                    local itemName = Config.giveableItems[randomitempull]
+                                    TriggerServerEvent('esx_mugging:giveItems', (itemName))
                                 end
-                            randomact = math.random(1,10)
-                            if randomact > 6 then
-                                PlayAmbientSpeech1(targetPed, "GENERIC_INSULT_HIGH", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
-                            elseif randomact > 3 then
-                                PlayAmbientSpeech1(targetPed, "GENERIC_FRIGHTENED_HIGH", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                             end
-                            robbing = true
-                            lastrobbed = math.random(1, 100)
-                            if lastrobbed <= Config.PoliceNotify then
-                                    ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
-                                    local sex = nil
-                                    if skin.sex == 0 then
-                                        sex = "Male" --male/change it to your language
-                                    else
-                                        sex = "Female" --female/change it to your language
-                                    end
-                                    TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
-
-                                    if s2 == 0 then
-                                        TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, reportcoords)
-                                    elseif s2 ~= 0 then
-                                        TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
-                                    end
-                                end)
-                            end
-                            
-                            TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
-                            Citizen.Wait(3000)
-
-                            lasttargetPed = targetPed
-                            robbing = false
-                            currentrobbing = false
-                        else
-                            if Config.AlwaysNotifyonDeath then
-                                ESX.ShowNotification("Target died - Police will be notified")
-                                ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
-                                    local sex = nil
-                                    if skin.sex == 0 then
-                                        sex = "Male" --male/change it to your language
-                                    else
-                                        sex = "Female" --female/change it to your language
-                                    end
-                                    TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
-                                    TriggerServerEvent('esx_mugging:muggingAlertS2', street1, sex, reportcoords)
-
-                                end)
-                            end
-                            robbing = false
-                            currentrobbing = false
+                        randomact = math.random(1,10)
+                        if randomact > 6 then
+                            PlayAmbientSpeech1(targetPed, "GENERIC_INSULT_HIGH", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
+                        elseif randomact > 3 then
+                            PlayAmbientSpeech1(targetPed, "GENERIC_FRIGHTENED_HIGH", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                         end
-                    else
-                        ESX.ShowNotification("To far away from target")
+                        robbing = true
                         lastrobbed = math.random(1, 100)
                         if lastrobbed <= Config.PoliceNotify then
+                                ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
+                                local sex = nil
+                                if skin.sex == 0 then
+                                    sex = "Male" --male/change it to your language
+                                else
+                                    sex = "Female" --female/change it to your language
+                                end
+                                TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
+
+                                if s2 == 0 then
+                                    TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, reportcoords)
+                                elseif s2 ~= 0 then
+                                    TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
+                                end
+                            end)
+                        end
+                        lasttargetPed = targetPed
+                        robbing = false
+                        currentrobbing = false
+                        if Config.CoolDownTime ~= 0 then
+                            IsMuggingAllowed = false
+                            CoolDown()
+                        end
+                    else
+                        
+                        if Config.CoolDownTime ~= 0 then
+                            IsMuggingAllowed = false
+                            CoolDown()
+                        end
+                        if Config.AlwaysNotifyonDeath then
+                            ESX.ShowNotification("Target died - Police will be notified")
                             ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                                 local sex = nil
                                 if skin.sex == 0 then
@@ -178,16 +192,38 @@ function robNpc(targetPed)
                                     sex = "Female" --female/change it to your language
                                 end
                                 TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
-                                if s2 == 0 then
-                                    TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, plyPos)
-                                elseif s2 ~= 0 then
-                                    TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
-                                end
+                                TriggerServerEvent('esx_mugging:muggingAlertS2', street1, sex, reportcoords)
+
                             end)
                         end
                         robbing = false
                         currentrobbing = false
                     end
+                else
+                    if Config.CoolDownTime ~= 0 then
+                        IsMuggingAllowed = false
+                        CoolDown()
+                    end
+                    ESX.ShowNotification("To far away from target")
+                    lastrobbed = math.random(1, 100)
+                    if lastrobbed <= Config.PoliceNotify then
+                        ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
+                            local sex = nil
+                            if skin.sex == 0 then
+                                sex = "Male" --male/change it to your language
+                            else
+                                sex = "Female" --female/change it to your language
+                            end
+                            TriggerServerEvent('esx_mugging:muggingPos', plyPos.x, plyPos.y, plyPos.z)
+                            if s2 == 0 then
+                                TriggerServerEvent('esx_mugging:muggingAlertS1', street1, sex, plyPos)
+                            elseif s2 ~= 0 then
+                                TriggerServerEvent('esx_mugging:muggingAlert', street1, street2, sex, reportcoords)
+                            end
+                        end)
+                    end
+                    robbing = false
+                    currentrobbing = false
                 end
             end
         end
@@ -237,3 +273,5 @@ AddEventHandler('esx_mugging:muggingPos', function(tx, ty, tz)
 		end
 	end
 end)
+
+

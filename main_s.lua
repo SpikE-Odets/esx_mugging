@@ -1,6 +1,8 @@
 ESX = nil
+cooldownlist = {}
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 local copsConnected = 0
+
 
 
 function CountCops()

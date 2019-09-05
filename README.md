@@ -15,11 +15,13 @@ Change Log:
 
 Latest Version:
 
-	Added check to see if ped is fleeing - no more stopping NPC from full sprint.
-	
+	Added cooldown time in Config.CoolDownTime.  Default is set to 30 sec, set to 0 to turn off cooldown.
+	Added Config.MustUseVoice in config as well.  This will make it so the player has to use ingame voice to activate the mugging.
+	( I want to add a timeout in this so if you do not hit E or Use voice to start the mugging after a certain time the ped will run away but need find the best solution to get this coded in.  Hopefully next update will have this added)
 	
 Previous Fix:
 	
+	Added check to see if ped is fleeing - no more stopping NPC from full sprint.
 	Removed the abality to mug NPC from inside vehicle.
 	Changed the check for target running away - check for target distance. ( no more mugging and running away from NPC and still getting cash)
 	Added support for BlackMoney in Config.   Just set  Config.DirtyMoney = true   and will payout only BlackMoney.
