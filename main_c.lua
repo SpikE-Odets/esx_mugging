@@ -64,19 +64,17 @@ Citizen.CreateThread(function()
                                         ResetPedLastVehicle(targetPed)
                                         ClearPedTasks(targetPed)
                                         Citizen.Wait(1000)
-                                        if not robbing and IsMuggingAllowed then
-                                            if targetPed ~= lasttargetPed then
-                                                robNpc(targetPed)
-                                            else
-                                                AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)  
-                                            end
+                                        if targetPed == lasttargetPed then
+                                            AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)  
+                                        elseif not robbing and IsMuggingAllowed then
+                                            robNpc(targetPed)
                                         end
                                     end
-                                elseif not robbing and IsMuggingAllowed then
-                                    if targetPed ~= lasttargetPed then
+                                else 
+                                    if targetPed == lasttargetPed then
+                                        AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)  
+                                    elseif not robbing and IsMuggingAllowed then
                                         robNpc(targetPed)
-                                    else
-                                        AddShockingEventAtPosition(116, GetEntityCoords(targetPed),0.5)  
                                     end
                                 end
                             end
@@ -132,7 +130,7 @@ function robNpc(targetPed)
                 tCoords = GetEntityCoords(targetPed, true)
                 if GetDistanceBetweenCoords(pCoords.x, pCoords.y, pCoords.z, tCoords.x, tCoords.y, tCoords.z, true) <= 5.0 then 
                     if not IsPedDeadOrDying(targetPed) then
-                        AddShockingEventAtPosition(116, GetEntityCoords(targetPed),0.5)
+                        AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)
                         TriggerServerEvent("esx_mugging:giveMoney")
                         additems = math.random(1,100)
                             if additems <= Config.AddItemsPerctent then
