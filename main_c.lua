@@ -63,7 +63,6 @@ Citizen.CreateThread(function()
                                         TaskLeaveVehicle(targetPed, localvehicle, 1)
                                         ResetPedLastVehicle(targetPed)
                                         ClearPedTasks(targetPed)
-                                        Citizen.Wait(1000)
                                         if targetPed == lasttargetPed then
                                             AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)  
                                         elseif not robbing and IsMuggingAllowed then
