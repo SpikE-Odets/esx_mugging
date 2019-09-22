@@ -14,7 +14,7 @@ Config.CoolDownTime = 30            --  This is time between mugging NPC in seco
 
 Config.PoliceNotify = 40            --  This is percent the police will get notified: example: 40 means 40% chance of notification.
 Config.AlwaysNotifyonDeath = true   --  This will set to 100% notify if NPC dies while someone is mugging them.
-Config.MustUseVoice = true          --  With this on, the player must be speaking in game when trying to much someone or the npc will ignore.  
+Config.MustUseVoice = false          --  With this on, the player must be speaking in game when trying to much someone or the npc will ignore.  
 
 
 Config.giveableItems = {
