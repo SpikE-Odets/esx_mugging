@@ -61,6 +61,11 @@ Citizen.CreateThread(function()
                                     local localvehicle = GetVehiclePedIsIn(targetPed, false)
                                     if IsVehicleStopped(localvehicle) and not robbing and IsMuggingAllowed then
                                         TaskLeaveVehicle(targetPed, localvehicle, 1)
+					incar = true
+					while incar do
+					  Citizen.Wait(0)
+					  if IsPedInAnyVehicle(targetPed, false) then incar = false end
+					end
                                         ResetPedLastVehicle(targetPed)
                                         ClearPedTasks(targetPed)
                                         if targetPed == lasttargetPed then
