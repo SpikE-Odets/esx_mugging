@@ -63,7 +63,7 @@ Citizen.CreateThread(function()
                                         TaskLeaveVehicle(targetPed, localvehicle, 1)
 					incar = true
 					while incar do
-					  Citizen.Wait(0)
+					  Citizen.Wait(100)
 					  if IsPedInAnyVehicle(targetPed, false) then incar = false end
 					end
                                         ResetPedLastVehicle(targetPed)
