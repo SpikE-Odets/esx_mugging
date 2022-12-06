@@ -136,6 +136,18 @@ function robNpc(targetPed)
                     if not IsPedDeadOrDying(targetPed) then
                         AddShockingEventAtPosition(99, GetEntityCoords(targetPed),0.5)
                         TriggerServerEvent("esx_mugging:giveMoney")
+                        if Config.NPCPolice then
+                            local reportRoll = math.random(0, 10)
+                            CreateThread(function()
+                                for i = 1, 15 do
+                                    EnableDispatchService(i, true)
+                                end
+                                SetMaxWantedLevel(5)
+                            end)
+                            if reportRoll == 1 then
+                                ReportCrime(PlayerId(), 11, GetWantedLevelThreshold(2))
+                            end
+                        end
                         additems = math.random(1,100)
                             if additems <= Config.AddItemsPerctent then
                                     randomitemcount = math.random(1,Config.AddItemsMax)
